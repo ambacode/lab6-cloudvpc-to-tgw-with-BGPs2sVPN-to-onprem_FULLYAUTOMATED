@@ -1,0 +1,62 @@
+---
+- name: Configure StrongSwan VPN Gateway
+  hosts: strongswan
+  become: yes
+  tasks:
+    - name: Create FRR config file from template
+      ansible.builtin.template:
+        src: templates/frr.conf.j2
+        dest: /etc/frr/frr.conf
+        owner: frr
+        group: frr
+        mode: '0640'
+      notify: Restart FRR
+
+    - name: Create IPsec secrets file from template
+      ansible.builtin.template:
+        src: templates/ipsec.secrets.j2
+        dest: /etc/ipsec.secrets
+        owner: root
+        group: root
+        mode: '0600'
+      notify: Restart StrongSwan
+
+    - name: Create IPsec config file from template
+      ansible.builtin.template:
+        src: templates/ipsec.conf.j2
+        dest: /etc/ipsec.conf
+        owner: root
+        group: root
+        mode: '0644'
+      notify: Restart StrongSwan
+
+    - name: Create and enable VTI systemd service
+      ansible.builtin.template:
+        src: templates/vti.service.j2
+        dest: /etc/systemd/system/vti.service
+        owner: root
+        group: root
+        mode: '0644'
+      notify:
+        - Reload systemd
+        - Restart VTI Service
+
+  handlers:
+    - name: Restart FRR
+      ansible.builtin.service:
+        name: frr
+        state: restarted
+
+    - name: Restart StrongSwan
+      ansible.builtin.service:
+        name: strongswan-starter
+        state: restarted
+
+    - name: Reload systemd
+      ansible.builtin.systemd:
+        daemon_reload: yes
+
+    - name: Restart VTI Service
+      ansible.builtin.service:
+        name: vti
+        state: restarted

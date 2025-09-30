@@ -1,0 +1,14 @@
+[Unit]
+Description=VTI Tunnels and Local Route
+After=network.target
+
+[Service]
+Type=oneshot
+ExecStart=/bin/sh -c 'ip link add Tunnel1 type vti local {{ LOCAL_PRIVATE_IP }} remote {{ T1_AWS_PUBLIC_IP }} key 100 && ip addr add {{ T1_LOCAL_PTP }}/30 peer {{ T1_REMOTE_PTP }}/30 dev Tunnel1 && ip link set Tunnel1 up mtu 1419'
+ExecStart=/bin/sh -c 'ip link add Tunnel2 type vti local {{ LOCAL_PRIVATE_IP }} remote {{ T2_AWS_PUBLIC_IP }} key 200 && ip addr add {{ T2_LOCAL_PTP }}/30 peer {{ T2_REMOTE_PTP }}/30 dev Tunnel2 && ip link set Tunnel2 up mtu 1419'
+
+
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,36 @@
+config setup
+    charondebug="all"
+    uniqueids=yes
+
+conn %default
+    keyexchange=ikev1
+    leftauth=psk
+    rightauth=psk
+    ike=aes128-sha1-modp1024
+    ikelifetime=8h
+    esp=aes128-sha1-modp1024
+    lifetime=1h
+    keyingtries=%forever
+    dpddelay=10s
+    dpdtimeout=30s
+    dpdaction=restart
+
+conn Tunnel1
+    auto=start
+    left=%defaultroute
+    leftid={{ CGW_PUBLIC_IP }}
+    right={{ T1_AWS_PUBLIC_IP }}
+    type=tunnel
+    leftsubnet=0.0.0.0/0
+    rightsubnet=0.0.0.0/0
+    mark=100
+
+conn Tunnel2
+    auto=start
+    left=%defaultroute
+    leftid={{ CGW_PUBLIC_IP }}
+    right={{ T2_AWS_PUBLIC_IP }}
+    type=tunnel
+    leftsubnet=0.0.0.0/0
+    rightsubnet=0.0.0.0/0
+    mark=200

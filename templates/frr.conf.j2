@@ -1,0 +1,22 @@
+!
+frr version 8.4.1
+frr defaults traditional
+hostname strongswan-router
+log stdout
+!
+router bgp 65000
+  ! Neighbor session for Tunnel 1
+  neighbor {{ T1_REMOTE_PTP }} remote-as 64512
+  neighbor {{ T1_REMOTE_PTP }} description "AWS VPN Tunnel 1"
+  neighbor {{ T1_REMOTE_PTP }} update-source {{ T1_LOCAL_PTP }}
+  !
+  ! Neighbor session for Tunnel 2
+  neighbor {{ T2_REMOTE_PTP }} remote-as 64512
+  neighbor {{ T2_REMOTE_PTP }} description "AWS VPN Tunnel 2"
+  neighbor {{ T2_REMOTE_PTP }} update-source {{ T2_LOCAL_PTP }}
+  !
+  ! Address family for IPv4
+  address-family ipv4 unicast
+    network 10.20.0.0/16
+  exit-address-family
+!
